@@ -1,3 +1,14 @@
+const obj = {
+  name: 'Vikram',
+  getName(){
+    return this.name
+  }
+};
+
+const getName = obj.getName.bind(obj);
+console.log(getName());
+
+
 class IndecisionApp extends React.Component {
   render() {
     const title = 'Indecision';
@@ -27,19 +38,28 @@ class Header extends React.Component {
 }
 
 class Action extends React.Component {
+  handlePick(){
+    alert('HandlePick');
+  }
   render(){
     return (
       <div>
-        <button>What should I do?</button>
+        <button onClick={this.handlePick}>What should I do?</button>
       </div>
     );
   };
 }
 
 class Options extends React.Component {
+  handleRemoveAll(){
+    //the 'this' keyword, when used in a function, refers to the function itself, NOT the parent object, so in the below example this will be undefined.  To fix this, we add the bind() method to the onClick, which forces the context of 'this' to be the object CONTAINING the function ('this', as defined by the onClick, is the parent object ).  Since the parent object is where the props lie, we now have access to this.props.
+    
+    console.log(this.props.options);
+  }
   render(){
     return (
       <div>
+      <button onClick={this.handleRemoveAll.bind(this)}>Remove all</button>
         {
           this.props.options.map((option) => {
             return <Option key={option} optionText={option} />
@@ -62,10 +82,22 @@ class Option extends React.Component {
 }
 
 class AddOption extends React.Component {
+  handleAddOption(e){
+    e.preventDefault();
+    const option = e.target.elements.option.value.trim();
+
+    if(option) {
+      alert(option);
+    }
+  }
+
   render(){
     return (
       <div>
-        This is where user adds options
+        <form action="" onSubmit={this.handleAddOption}>
+          <input type="text" name="option" />
+          <button>Add option</button>
+        </form>
       </div>
     );
   }

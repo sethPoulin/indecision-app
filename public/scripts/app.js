@@ -8,6 +8,16 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var obj = {
+  name: 'Vikram',
+  getName: function getName() {
+    return this.name;
+  }
+};
+
+var getName = obj.getName.bind(obj);
+console.log(getName());
+
 var IndecisionApp = function (_React$Component) {
   _inherits(IndecisionApp, _React$Component);
 
@@ -80,6 +90,11 @@ var Action = function (_React$Component3) {
   }
 
   _createClass(Action, [{
+    key: 'handlePick',
+    value: function handlePick() {
+      alert('HandlePick');
+    }
+  }, {
     key: 'render',
     value: function render() {
       return React.createElement(
@@ -87,7 +102,7 @@ var Action = function (_React$Component3) {
         null,
         React.createElement(
           'button',
-          null,
+          { onClick: this.handlePick },
           'What should I do?'
         )
       );
@@ -107,11 +122,23 @@ var Options = function (_React$Component4) {
   }
 
   _createClass(Options, [{
+    key: 'handleRemoveAll',
+    value: function handleRemoveAll() {
+      //the 'this' keyword, when used in a function, refers to the function itself, NOT the parent object, so in the below example this will be undefined.  To fix this, we add the bind() method to the onClick, which forces the context of 'this' to be the object CONTAINING the function ('this', as defined by the onClick, is the parent object ).  Since the parent object is where the props lie, we now have access to this.props.
+
+      console.log(this.props.options);
+    }
+  }, {
     key: 'render',
     value: function render() {
       return React.createElement(
         'div',
         null,
+        React.createElement(
+          'button',
+          { onClick: this.handleRemoveAll.bind(this) },
+          'Remove all'
+        ),
         this.props.options.map(function (option) {
           return React.createElement(Option, { key: option, optionText: option });
         }),
@@ -156,12 +183,31 @@ var AddOption = function (_React$Component6) {
   }
 
   _createClass(AddOption, [{
+    key: 'handleAddOption',
+    value: function handleAddOption(e) {
+      e.preventDefault();
+      var option = e.target.elements.option.value.trim();
+
+      if (option) {
+        alert(option);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       return React.createElement(
         'div',
         null,
-        'This is where user adds options'
+        React.createElement(
+          'form',
+          { action: '', onSubmit: this.handleAddOption },
+          React.createElement('input', { type: 'text', name: 'option' }),
+          React.createElement(
+            'button',
+            null,
+            'Add option'
+          )
+        )
       );
     }
   }]);
