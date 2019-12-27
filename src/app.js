@@ -1,7 +1,8 @@
 const obj = {
   name: 'Vikram',
   getName(){
-    return this.name
+    console.log(this);
+    return this.name;
   }
 };
 
@@ -52,14 +53,14 @@ class Action extends React.Component {
 
 class Options extends React.Component {
   handleRemoveAll(){
-    //the 'this' keyword, when used in a function, refers to the function itself, NOT the parent object, so in the below example this will be undefined.  To fix this, we add the bind() method to the onClick, which forces the context of 'this' to be the object CONTAINING the function ('this', as defined by the onClick, is the parent object ).  Since the parent object is where the props lie, we now have access to this.props.
-    
+    //This is pretty complicated, but the gist is this: 'This' refers to the object that contains as a method the function which contains the 'this.' When the function is called as a callback function, or is an event handler (I think just another type of callback function), or is first assigned to a variable and THEN called, in all 3 cases the original object that provided the execution context for the function is lost, and so the thing 'this' refers to is lost.  WHEN THE FUNCTION IS ACTUALLY CALLED, that is when we assess what 'this' refers to.  If at that point it is not being called within the execution context of an object, then 'this' is undefined (in strict mode) or the Global object.  All functions by default execute in the global context unless they are methods on an object.  So 'this' in functions will by default be undefined.
+
     console.log(this.props.options);
   }
   render(){
     return (
       <div>
-      <button onClick={this.handleRemoveAll.bind(this)}>Remove all</button>
+      <button onClick={this.handleRemoveAll}>Remove all</button>
         {
           this.props.options.map((option) => {
             return <Option key={option} optionText={option} />
