@@ -11,90 +11,151 @@ console.log(getName());
 
 
 class IndecisionApp extends React.Component {
+  constructor(props){
+    super(props);
+    this.handleDeleteOptions = this.handleDeleteOptions.bind(this);
+    this.handlePick = this.handlePick.bind(this);
+    this.handleAddOption = this.handleAddOption.bind(this);
+    this.state = {
+      options: props.options
+    };
+  }
+
+  handlePick(){
+    const randomNum = Math.floor(Math.random() * this.state.options.length);
+    const option = this.state.options[randomNum];
+    alert(option);
+  }
+
+  handleAddOption(option) {
+    if(!option) {
+      return 'Enter valid value to add item'
+    } else if (this.state.options.indexOf(option) > -1){
+      return 'This option already exists'
+    }
+    this.setState((prevState) => {
+      return {
+        options: prevState.options.concat([option])
+      }
+    })
+  }
+  
+  handleDeleteOptions(){
+    this.setState(() => {
+      return {
+        options: []
+      };
+    });
+  }
+  
   render() {
-    const title = 'Indecision';
     const subtitle = 'Put your life in the hands of a computer';
-    const options = ['Thing one', 'Thing two', 'Thing four'];
     
     return (
       <div>
-        <Header title={title} subtitle={subtitle}/>
-        <Action />
-        <Options options={options}/>
-        <AddOption/>
+        <Header subtitle={subtitle}/>
+        <Action 
+          hasOptions={this.state.options.length > 0}
+          handlePick={this.handlePick}
+        />
+        <Options 
+          options={this.state.options}
+          handleDeleteOptions={this.handleDeleteOptions}
+        />
+        <AddOption
+          handleAddOption={this.handleAddOption}
+        />
       </div>
     );
   }
 }
 
-class Header extends React.Component {
-  render() {
-    return( 
-      <div>
-        <h1>{this.props.title}</h1>
-        <h2>{this.props.subtitle}</h2>
-      </div>
-    );
-  }
+IndecisionApp.defaultProps = {
+  options: []
 }
 
-class Action extends React.Component {
-  handlePick(){
-    alert('HandlePick');
-  }
-  render(){
-    return (
-      <div>
-        <button onClick={this.handlePick}>What should I do?</button>
-      </div>
-    );
-  };
+const Header = (props) => {
+
+  return( 
+    <div>
+      <h1>{props.title}</h1>
+      {props.subtitle} && <h2>{props.subtitle}</h2>
+    </div>
+  );
 }
 
-class Options extends React.Component {
-  handleRemoveAll(){
+Header.defaultProps = {
+  title: 'Indecision App'
+}
+
+const Action = (props) => {
+  return (
+    <div>
+      <button 
+        onClick={props.handlePick}
+        disabled={!props.hasOptions}
+      >
+        What should I do?
+      </button>
+    </div>
+  );
+}
+
+const Options = (props) => {
+  // handleRemoveAll(){
     //This is pretty complicated, but the gist is this: 'This' refers to the object that contains as a method the function which contains the 'this.' When the function is called as a callback function, or is an event handler (I think just another type of callback function), or is first assigned to a variable and THEN called, in all 3 cases the original object that provided the execution context for the function is lost, and so the thing 'this' refers to is lost.  WHEN THE FUNCTION IS ACTUALLY CALLED, that is when we assess what 'this' refers to.  If at that point it is not being called within the execution context of an object, then 'this' is undefined (in strict mode) or the Global object.  All functions by default execute in the global context unless they are methods on an object.  So 'this' in functions will by default be undefined.
 
-    console.log(this.props.options);
-  }
-  render(){
-    return (
-      <div>
-      <button onClick={this.handleRemoveAll}>Remove all</button>
-        {
-          this.props.options.map((option) => {
-            return <Option key={option} optionText={option} />
-          })
-        }
-        <Option />
-      </div>
-    );
-  }
+    // console.log(this.props.options);
+  // }
+  
+  return (
+    <div>
+    <button onClick={props.handleDeleteOptions}>Remove all</button>
+      {
+        props.options.map((option) => {
+          return <Option key={option} optionText={option} />
+        })
+      }
+      <Option />
+    </div>
+  );
 }
 
-class Option extends React.Component {
-  render(){
-    return (
-      <div>
-        {this.props.optionText}
-      </div>
-    );
-  }
+const Option = (props) => {
+
+  return (
+    <div>
+      {props.optionText}
+    </div>
+  );
+
 }
 
 class AddOption extends React.Component {
+  constructor(props){
+    super(props);
+    this.handleAddOption = this.handleAddOption.bind(this)
+    this.state = {
+      error: undefined
+    }
+  }
   handleAddOption(e){
     e.preventDefault();
     const option = e.target.elements.option.value.trim();
+    //we do this because running this.props.handleAddOption, which is the function in the parent component above will only RETURN something if something went wrong.  Otherwise it will change state and not return anything.
+    const error = this.props.handleAddOption(option);
 
-    if(option) {
-      alert(option);
-    }
+    this.setState(() => {
+      return {
+        error: error
+      }
+    })
   }
 
   render(){
     return (
       <div>
+        {this.state.error && <p>{this.state.error}</p>}
         <form action="" onSubmit={this.handleAddOption}>
           <input type="text" name="option" />
           <button>Add option</button>
@@ -104,4 +165,14 @@ class AddOption extends React.Component {
   }
 }
 
+// const User = (props) => {
+//   return (
+//     <div>
+//      <p>Name: {props.name}</p>
+//      <p>Age: {props.age}</p>
+//     </div>
+//   );
+// };
+
 ReactDOM.render(<IndecisionApp />, document.getElementById('app'))
+
